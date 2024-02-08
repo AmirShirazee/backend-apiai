@@ -7,11 +7,7 @@ interface Connect extends ConnectOptions {
 }
 mongoose.set('strictQuery', true);
 
-const LOCAL_MONGO_DB = 'mongodb://127.0.0.1:27017/localApiAi';
-const AZURE_COSMOS_DB =
-  'mongodb://testgenerator-server:CTDzcIpWuy2eipa2ZSPTG1p9dErO6ReZuBUu4KBHphuy4pDRN8TmsUWnHqRbsgDtiXGedFlaVkkAACDbQOEzGQ==@testgenerator-server.mongo.cosmos.azure.com:10255/testgenerator-database?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@testgenerator-server@';
-
-const connectionString = isProduction ? AZURE_COSMOS_DB : LOCAL_MONGO_DB;
+const connectionString = 'mongodb+srv://root:root@cluster0.2v1s9.mongodb.net/ApiAi?retryWrites=true&w=majority'
 if (!connectionString) {
   console.error(
     colors.red.underline('No DB connection string found. Please set the DB. Process exiting...'),
