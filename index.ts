@@ -11,7 +11,6 @@ import connectDB from './db/mongo';
 const port = process.env.PORT || 3000;
 const app: Express = express();
 
-// Initialize middleware
 const initializeMiddleware = (app: Express) => {
   initRateLimit(app);
 

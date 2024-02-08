@@ -14,7 +14,6 @@ const isProd_1 = require("./utils/isProd");
 const mongo_1 = __importDefault(require("./db/mongo"));
 const port = process.env.PORT || 3000;
 const app = (0, express_1.default)();
-// Initialize middleware
 const initializeMiddleware = (app) => {
     (0, rate_limit_1.initRateLimit)(app);
     app.use((0, cors_1.default)({
