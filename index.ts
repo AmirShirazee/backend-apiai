@@ -8,7 +8,7 @@ import { initRateLimit } from './startup/rate-limit';
 import { isProduction } from './utils/isProd';
 import connectDB from './db/mongo';
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 const app: Express = express();
 
 // Initialize middleware

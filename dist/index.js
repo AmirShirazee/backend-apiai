@@ -12,7 +12,7 @@ const routes_1 = require("./routes");
 const rate_limit_1 = require("./startup/rate-limit");
 const isProd_1 = require("./utils/isProd");
 const mongo_1 = __importDefault(require("./db/mongo"));
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 const app = (0, express_1.default)();
 // Initialize middleware
 const initializeMiddleware = (app) => {
