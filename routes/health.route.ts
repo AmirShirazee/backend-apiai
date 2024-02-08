@@ -8,4 +8,4 @@ router.get('/', (req, res) => {
 }
 );
 
-export { router as uploadRouter };
+export {router as healthRouter};
