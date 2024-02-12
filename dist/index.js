@@ -14,7 +14,7 @@ const isProd_1 = require("./utils/isProd");
 const mongo_1 = __importDefault(require("./db/mongo"));
 const port = 3000;
 const app = (0, express_1.default)();
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 const initializeMiddleware = (app) => {
     (0, rate_limit_1.initRateLimit)(app);
     app.use((0, cors_1.default)({
@@ -34,7 +34,6 @@ const startServer = () => {
         console.log(colors_1.default.green.underline(`Server running on port ${port}`));
     });
 };
-// Connect to database and then prepare the Next.js application
 (0, mongo_1.default)()
     .then(() => {
     initializeMiddleware(app);

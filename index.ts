@@ -10,7 +10,7 @@ import connectDB from "./db/mongo";
 
 const port = 3000;
 const app: Express = express();
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 
 const initializeMiddleware = (app: Express) => {
   initRateLimit(app);
