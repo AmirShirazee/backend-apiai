@@ -14,16 +14,19 @@ const isProd_1 = require("./utils/isProd");
 const mongo_1 = __importDefault(require("./db/mongo"));
 const port = 3000;
 const app = (0, express_1.default)();
+app.set("trust proxy", true);
 const initializeMiddleware = (app) => {
     (0, rate_limit_1.initRateLimit)(app);
     app.use((0, cors_1.default)({
-        origin: isProd_1.isProduction ? 'https://testgenerator.azurewebsites.net' : 'http://localhost:8080',
+        origin: isProd_1.isProduction
+            ? "https://apiai-testgenerator.com"
+            : "http://localhost:8080",
         credentials: true,
     }));
-    app.use((0, cookie_parser_1.default)('secret-cookie'));
+    app.use((0, cookie_parser_1.default)("secret-cookie"));
     app.use(express_1.default.json());
     app.use(express_1.default.urlencoded({ extended: false }));
-    app.use((0, morgan_1.default)(isProd_1.isProduction ? 'combined' : 'dev'));
+    app.use((0, morgan_1.default)(isProd_1.isProduction ? "combined" : "dev"));
     (0, routes_1.initRoutes)(app);
 };
 const startServer = () => {
