@@ -5,6 +5,6 @@ import jwtMiddleware from "../utils/jwt";
 import userAuthorizationMiddleware from "../middleware/auth";
 
 export function initRoutes(app: Express) {
-  app.use("/api/upload", userAuthorizationMiddleware, uploadRouter);
-  app.use("/api/health", healthRouter);
+  app.use("/backend/api/upload", userAuthorizationMiddleware, uploadRouter);
+  app.use("/backend/api/health", healthRouter);
 }

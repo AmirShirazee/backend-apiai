@@ -8,8 +8,8 @@ const upload_routes_1 = require("./upload.routes");
 const health_route_1 = require("./health.route");
 const auth_1 = __importDefault(require("../middleware/auth"));
 function initRoutes(app) {
-    app.use("/api/upload", auth_1.default, upload_routes_1.uploadRouter);
-    app.use("/api/health", health_route_1.healthRouter);
+    app.use("/backend/api/upload", auth_1.default, upload_routes_1.uploadRouter);
+    app.use("/backend/api/health", health_route_1.healthRouter);
 }
 exports.initRoutes = initRoutes;
 //# sourceMappingURL=index.js.map
