@@ -15,11 +15,22 @@ const mongo_1 = __importDefault(require("./db/mongo"));
 const port = 3000;
 const app = (0, express_1.default)();
 app.set("trust proxy", 1);
+const allowedIPs = ["217.123.79.176", "172.31.35.192"];
+const ipWhitelistMiddleware = (req, res, next) => {
+    const clientIP = req.ip;
+    if (allowedIPs.includes(clientIP)) {
+        next();
+    }
+    else {
+        res.status(403).json({ message: "Access denied" });
+    }
+};
 const initializeMiddleware = (app) => {
+    app.use(ipWhitelistMiddleware);
     (0, rate_limit_1.initRateLimit)(app);
     app.use((0, cors_1.default)({
         origin: isProd_1.isProduction
-            ? "https://apiai-testgenerator.com"
+            ? "https://testopenapi.com"
             : "http://localhost:8080",
         credentials: true,
     }));
