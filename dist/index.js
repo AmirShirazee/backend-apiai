@@ -15,6 +15,9 @@ const mongo_1 = __importDefault(require("./db/mongo"));
 const port = 3000;
 const app = (0, express_1.default)();
 app.set("trust proxy", 1);
+app.get("/backend/api/health", (req, res) => {
+    res.status(200).json({ message: "Server is running!" });
+});
 const allowedIPs = [
     "217.123.79.176",
     "172.31.35.192",
