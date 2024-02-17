@@ -18,22 +18,27 @@ app.set("trust proxy", 1);
 app.get("/backend/api/health", (req, res) => {
     res.status(200).json({ message: "Server is running!" });
 });
-const allowedIPs = [
-    "217.123.79.176",
-    "172.31.35.192",
-    "13.37.177.41",
-];
-const ipWhitelistMiddleware = (req, res, next) => {
-    const clientIP = req.ip;
-    if (allowedIPs.includes(clientIP)) {
-        next();
-    }
-    else {
-        res.status(403).json({ message: "Access denied" });
-    }
-};
+//
+// const allowedIPs: string[] = [
+//   "217.123.79.176",
+//   "172.31.35.192",
+//   "13.37.177.41",
+// ];
+// const ipWhitelistMiddleware = (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction,
+// ) => {
+//   const clientIP = req.ip;
+//
+//   if (allowedIPs.includes(<string>clientIP)) {
+//     next();
+//   } else {
+//     res.status(403).json({ message: "Access denied" });
+//   }
+// };
 const initializeMiddleware = (app) => {
-    app.use(ipWhitelistMiddleware);
+    // app.use(ipWhitelistMiddleware);
     (0, rate_limit_1.initRateLimit)(app);
     app.use((0, cors_1.default)({
         origin: isProd_1.isProduction
