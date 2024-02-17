@@ -1,33 +1,32 @@
-import path from 'path';
-import { NextFunction, Request, Response } from 'express';
-import multer from 'multer';
-import { handleFileProcessing } from '../helpers/handleFileProcessing';
-import Upload, { getFormattedUploadDate } from '../models/upload.model';
-import User from '../models/user.model';
-import TestFile from '../models/testfile.model';
-import ProjectModel from '../models/project.model';
-import { deleteObjectFromS3, getObjectFromS3, listFilesInFolder, uploadToS3 } from '../utils/s3';
-import { bucketNameForUploads } from '../types/s3';
-
-//
-
+import path from "path";
+import { NextFunction, Request, Response } from "express";
+import multer from "multer";
+import { handleFileProcessing } from "../helpers/handleFileProcessing";
+import Upload, { getFormattedUploadDate } from "../models/upload.model";
+import User from "../models/user.model";
+import TestFile from "../models/testfile.model";
+import ProjectModel from "../models/project.model";
+import {
+  deleteObjectFromS3,
+  getObjectFromS3,
+  listFilesInFolder,
+  uploadToS3,
+} from "../utils/s3";
+import { bucketNameForUploads } from "../types/s3";
+import { isValidOpenApiV3 } from "../openApi/utils/validators";
 const storage: multer.StorageEngine = multer.memoryStorage();
-const isValidOpenApiV3 = (obj: any): boolean => {
-  if (!obj) return false;
-  if (!obj.openapi || !obj.openapi.startsWith('3.')) return false;
-  if (!obj.info || typeof obj.info !== 'object') return false;
-  return !(!obj.paths || typeof obj.paths !== 'object');
-};
 
 function checkFileType(file: any, cb: any) {
   const filetypes: RegExp = /json/;
-  const extname: boolean = filetypes.test(path.extname(file.originalname).toLowerCase());
+  const extname: boolean = filetypes.test(
+    path.extname(file.originalname).toLowerCase(),
+  );
   const mimetype: boolean = filetypes.test(file.mimetype);
 
   if (extname && mimetype) {
     return cb(null, true);
   } else {
-    cb('sorry, currently only json files are supported!', false);
+    cb("sorry, currently only json files are supported!", false);
   }
 }
 
@@ -38,16 +37,20 @@ const upload: multer.Multer = multer({
   },
 });
 
-export const uploadController = async (req: Request, res: Response, next: NextFunction) => {
+export const uploadController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   // @ts-ignore
-  upload.single('file')(req, res, async (err: any) => {
+  upload.single("file")(req, res, async (err: any) => {
     if (err) {
       return next(err);
     }
 
     const { file: uploadedFile } = req;
     if (!uploadedFile || !uploadedFile.buffer) {
-      return res.status(400).json({ message: 'Invalid or missing file.' });
+      return res.status(400).json({ message: "Invalid or missing file." });
     }
 
     const { user } = req.params;
@@ -55,7 +58,7 @@ export const uploadController = async (req: Request, res: Response, next: NextFu
     if (!isValidOpenApiV3(file)) {
       return res.status(400).json({
         message:
-          'The file does not adhere to the  OpenAPI v3 specification. Please upload a valid OpenAPI v3 specification',
+          "The file does not adhere to the  OpenAPI v3 specification. Please upload a valid OpenAPI v3 specification",
       });
     }
 
@@ -65,16 +68,28 @@ export const uploadController = async (req: Request, res: Response, next: NextFu
     }
 
     // Define the S3 bucket name and the file key
-    const folderName = 'uploads/' + user;
+    const folderName = "uploads/" + user;
     const s3FileKey = `${folderName}/${Date.now()}.json`;
 
     try {
       // Delete previous files from S3
-      const files: string[] = await listFilesInFolder(bucketNameForUploads, folderName);
-      await Promise.all(files.map((fileKey) => deleteObjectFromS3(bucketNameForUploads, fileKey)));
+      const files: string[] = await listFilesInFolder(
+        bucketNameForUploads,
+        folderName,
+      );
+      await Promise.all(
+        files.map((fileKey) =>
+          deleteObjectFromS3(bucketNameForUploads, fileKey),
+        ),
+      );
 
       // Upload new file to S3
-      await uploadToS3(bucketNameForUploads, s3FileKey, uploadedFile.buffer, 'application/json');
+      await uploadToS3(
+        bucketNameForUploads,
+        s3FileKey,
+        uploadedFile.buffer,
+        "application/json",
+      );
 
       // Update MongoDB with the reference to the S3 file
       await Upload.updateOne(
@@ -101,11 +116,11 @@ export const uploadController = async (req: Request, res: Response, next: NextFu
       await ProjectModel.deleteMany({ user: user });
       await handleFileProcessing(user);
 
-      return res.status(201).json({ message: 'File uploaded successfully' });
+      return res.status(201).json({ message: "File uploaded successfully" });
     } catch (error: any) {
       console.error(error);
       return res.status(500).json({
-        message: 'Error during file upload!',
+        message: "Error during file upload!",
         error: error.message,
       });
     }
@@ -116,7 +131,7 @@ export const getUploads = async (req: Request, res: Response) => {
   const uploads = await Upload.find({ user: req.params.user });
 
   if (!uploads || uploads.length === 0) {
-    return res.status(404).json({ message: 'No uploads found for this user.' });
+    return res.status(404).json({ message: "No uploads found for this user." });
   }
 
   // Fetching file content from S3
@@ -125,7 +140,7 @@ export const getUploads = async (req: Request, res: Response) => {
       // Extract the key from the s3Url
       const urlParts = new URL(upload.s3Url);
       const key = urlParts.pathname.substring(1);
-      const bucketName = urlParts.host.split('.')[0];
+      const bucketName = urlParts.host.split(".")[0];
 
       const content = await getObjectFromS3(bucketName, key);
       return { ...upload.toObject(), fileContent: content };
@@ -142,12 +157,12 @@ export const getUpload = async (req: Request, res: Response) => {
   const upload = await Upload.findById(req.params.id);
 
   if (!upload) {
-    return res.status(404).json({ message: 'Upload not found.' });
+    return res.status(404).json({ message: "Upload not found." });
   }
 
   const urlParts = new URL(upload.s3Url);
   const key = urlParts.pathname.substring(1);
-  const bucketName = urlParts.host.split('.')[0];
+  const bucketName = urlParts.host.split(".")[0];
 
   const fileContent = await getObjectFromS3(bucketName, key);
 
@@ -164,29 +179,29 @@ export const deleteUpload = async (req: Request, res: Response) => {
     const uploads = await Upload.find({ user: user });
     if (!uploads || uploads.length === 0) {
       return res.status(404).json({
-        status: 'fail',
-        message: 'No document found with that ID',
+        status: "fail",
+        message: "No document found with that ID",
       });
     }
 
     for (const upload of uploads) {
       const urlParts = new URL(upload.s3Url);
       const key = urlParts.pathname.substring(1);
-      const bucketName = urlParts.host.split('.')[0];
+      const bucketName = urlParts.host.split(".")[0];
       await deleteObjectFromS3(bucketName, key);
     }
 
     await deleteUserRelatedData(user);
 
     return res.json({
-      status: 'success',
-      message: 'Upload deleted',
+      status: "success",
+      message: "Upload deleted",
     });
   } catch (error: any) {
     console.error(error.message);
     return res.status(500).json({
-      status: 'error',
-      message: 'An error occurred while deleting the upload',
+      status: "error",
+      message: "An error occurred while deleting the upload",
     });
   }
 };
@@ -198,7 +213,7 @@ export const deleteUserRelatedData = async (userId: string) => {
     await TestFile.find({ user: userId }).deleteMany();
     await User.updateOne({ _id: userId }, { didUpload: false, project: false });
   } catch (error: any) {
-    console.error('Error deleting user-related data:', error.message);
+    console.error("Error deleting user-related data:", error.message);
     throw error;
   }
 };

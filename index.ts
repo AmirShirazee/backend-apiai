@@ -12,24 +12,28 @@ const port = 3000;
 const app: Express = express();
 app.set("trust proxy", 1);
 
-// const allowedIPs: string[] = ["217.123.79.176", "172.31.35.192"];
+const allowedIPs: string[] = [
+  "217.123.79.176",
+  "172.31.35.192",
+  "13.37.177.41",
+];
 
-// const ipWhitelistMiddleware = (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction,
-// ) => {
-//   const clientIP = req.ip;
-//
-//   if (allowedIPs.includes(<string>clientIP)) {
-//     next();
-//   } else {
-//     res.status(403).json({ message: "Access denied" });
-//   }
-// };
+const ipWhitelistMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const clientIP = req.ip;
+
+  if (allowedIPs.includes(<string>clientIP)) {
+    next();
+  } else {
+    res.status(403).json({ message: "Access denied" });
+  }
+};
 
 const initializeMiddleware = (app: Express) => {
-  // app.use(ipWhitelistMiddleware);
+  app.use(ipWhitelistMiddleware);
 
   initRateLimit(app);
 

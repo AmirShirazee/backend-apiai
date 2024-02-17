@@ -15,22 +15,22 @@ const mongo_1 = __importDefault(require("./db/mongo"));
 const port = 3000;
 const app = (0, express_1.default)();
 app.set("trust proxy", 1);
-// const allowedIPs: string[] = ["217.123.79.176", "172.31.35.192"];
-// const ipWhitelistMiddleware = (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction,
-// ) => {
-//   const clientIP = req.ip;
-//
-//   if (allowedIPs.includes(<string>clientIP)) {
-//     next();
-//   } else {
-//     res.status(403).json({ message: "Access denied" });
-//   }
-// };
+const allowedIPs = [
+    "217.123.79.176",
+    "172.31.35.192",
+    "13.37.177.41",
+];
+const ipWhitelistMiddleware = (req, res, next) => {
+    const clientIP = req.ip;
+    if (allowedIPs.includes(clientIP)) {
+        next();
+    }
+    else {
+        res.status(403).json({ message: "Access denied" });
+    }
+};
 const initializeMiddleware = (app) => {
-    // app.use(ipWhitelistMiddleware);
+    app.use(ipWhitelistMiddleware);
     (0, rate_limit_1.initRateLimit)(app);
     app.use((0, cors_1.default)({
         origin: isProd_1.isProduction
