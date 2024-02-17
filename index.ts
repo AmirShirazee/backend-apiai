@@ -12,9 +12,7 @@ const port = 3000;
 const app: Express = express();
 
 app.set("trust proxy", 1);
-app.get("/backend/api/health", (req: Request, res: Response) => {
-  res.status(200).json({ message: "Server is running!" });
-});
+
 //
 // const allowedIPs: string[] = [
 //   "217.123.79.176",
