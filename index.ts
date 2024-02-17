@@ -7,12 +7,17 @@ import { initRoutes } from "./routes";
 import { initRateLimit } from "./startup/rate-limit";
 import { isProduction } from "./utils/isProd";
 import connectDB from "./db/mongo";
+import userAuthorizationMiddleware from "./middleware/auth";
 
 const port = 3000;
 const app: Express = express();
 
 app.set("trust proxy", 1);
+app.get("/backend/api/health", (req: Request, res: Response) => {
+  res.status(200).json({ message: "Server is running!" });
+});
 
+app.use(userAuthorizationMiddleware);
 //
 // const allowedIPs: string[] = [
 //   "217.123.79.176",

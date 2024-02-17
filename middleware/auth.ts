@@ -20,7 +20,7 @@ const userAuthorizationMiddleware = (
     if (!tokenUserId) {
       return res
         .status(401)
-        .json({ message: "Invalid token: No user ID present in token." });
+        .json({ message: "You are not authorized to access this resource." });
     }
 
     // Attach the user ID to the request object
