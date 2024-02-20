@@ -12,37 +12,29 @@ const routes_1 = require("./routes");
 const rate_limit_1 = require("./startup/rate-limit");
 const isProd_1 = require("./utils/isProd");
 const mongo_1 = __importDefault(require("./db/mongo"));
+const auth_1 = __importDefault(require("./middleware/auth"));
 const port = 3000;
 const app = (0, express_1.default)();
 app.set("trust proxy", 1);
-//
-// const allowedIPs: string[] = [
-//   "217.123.79.176",
-//   "172.31.35.192",
-//   "13.37.177.41",
-// ];
-// const ipWhitelistMiddleware = (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction,
-// ) => {
-//   const clientIP = req.ip;
-//
-//   if (allowedIPs.includes(<string>clientIP)) {
-//     next();
-//   } else {
-//     res.status(403).json({ message: "Access denied" });
-//   }
-// };
+app.get("/backend/api/health", (req, res) => {
+    res.status(200).json({ message: "Server is running!" });
+});
+app.use(auth_1.default);
+const allowedOrigins = ["http://localhost:8080", "https://testopenapi.com"];
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error("Not allowed by CORS"), false);
+        }
+    },
+    credentials: true,
+};
 const initializeMiddleware = (app) => {
-    // app.use(ipWhitelistMiddleware);
     (0, rate_limit_1.initRateLimit)(app);
-    app.use((0, cors_1.default)({
-        origin: isProd_1.isProduction
-            ? "https://testopenapi.com"
-            : "http://localhost:8080",
-        credentials: true,
-    }));
+    app.use((0, cors_1.default)(corsOptions));
     app.use((0, cookie_parser_1.default)("secret-cookie"));
     app.use(express_1.default.json());
     app.use(express_1.default.urlencoded({ extended: false }));
