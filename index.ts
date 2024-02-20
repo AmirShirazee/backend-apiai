@@ -2,7 +2,7 @@ import express, { Express, Request, Response, NextFunction } from "express";
 import colors from "colors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import { initRoutes } from "./routes";
 import { initRateLimit } from "./startup/rate-limit";
 import { isProduction } from "./utils/isProd";
@@ -18,40 +18,24 @@ app.get("/backend/api/health", (req: Request, res: Response) => {
 });
 
 app.use(userAuthorizationMiddleware);
-//
-// const allowedIPs: string[] = [
-//   "217.123.79.176",
-//   "172.31.35.192",
-//   "13.37.177.41",
-// ];
-
-// const ipWhitelistMiddleware = (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction,
-// ) => {
-//   const clientIP = req.ip;
-//
-//   if (allowedIPs.includes(<string>clientIP)) {
-//     next();
-//   } else {
-//     res.status(403).json({ message: "Access denied" });
-//   }
-// };
-
+const allowedOrigins = ["http://localhost:8080", "https://testopenapi.com"];
+const corsOptions: CorsOptions = {
+  origin: (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void
+  ): void => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"), false);
+    }
+  },
+  credentials: true,
+};
 const initializeMiddleware = (app: Express) => {
-  // app.use(ipWhitelistMiddleware);
-
   initRateLimit(app);
 
-  app.use(
-    cors({
-      origin: isProduction
-        ? "https://testopenapi.com"
-        : "http://localhost:8080",
-      credentials: true,
-    }),
-  );
+  app.use(cors(corsOptions));
 
   app.use(cookieParser("secret-cookie"));
   app.use(express.json());
