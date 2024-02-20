@@ -5,7 +5,7 @@ import {
   getUploads,
   uploadController,
 } from "../controllers/upload.controller";
-import userAuthorizationMiddleware from "middleware/auth";
+import userAuthorizationMiddleware from "../middleware/auth";
 
 const router = Router();
 
