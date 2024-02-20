@@ -17,7 +17,6 @@ app.get("/backend/api/health", (req: Request, res: Response) => {
   res.status(200).json({ message: "Server is running!" });
 });
 
-app.use(userAuthorizationMiddleware);
 const allowedOrigins = ["http://localhost:8080", "https://testopenapi.com"];
 const corsOptions: CorsOptions = {
   origin: (
@@ -37,6 +36,7 @@ const initializeMiddleware = (app: Express) => {
 
   app.use(cors(corsOptions));
 
+  app.use(userAuthorizationMiddleware);
   app.use(cookieParser("secret-cookie"));
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));

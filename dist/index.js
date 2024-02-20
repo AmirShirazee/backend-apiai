@@ -19,7 +19,6 @@ app.set("trust proxy", 1);
 app.get("/backend/api/health", (req, res) => {
     res.status(200).json({ message: "Server is running!" });
 });
-app.use(auth_1.default);
 const allowedOrigins = ["http://localhost:8080", "https://testopenapi.com"];
 const corsOptions = {
     origin: (origin, callback) => {
@@ -35,6 +34,7 @@ const corsOptions = {
 const initializeMiddleware = (app) => {
     (0, rate_limit_1.initRateLimit)(app);
     app.use((0, cors_1.default)(corsOptions));
+    app.use(auth_1.default);
     app.use((0, cookie_parser_1.default)("secret-cookie"));
     app.use(express_1.default.json());
     app.use(express_1.default.urlencoded({ extended: false }));
