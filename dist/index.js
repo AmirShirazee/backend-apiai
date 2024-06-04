@@ -15,9 +15,6 @@ const mongo_1 = __importDefault(require("./db/mongo"));
 const port = 3000;
 const app = (0, express_1.default)();
 app.set("trust proxy", 1);
-app.get("/backend/api/health", (req, res) => {
-    res.status(200).json({ message: "Server is running!" });
-});
 const allowedOrigins = ["http://localhost:8080", "https://testopenapi.com"];
 const corsOptions = {
     origin: (origin, callback) => {
@@ -31,14 +28,22 @@ const corsOptions = {
     credentials: true,
 };
 const initializeMiddleware = (app) => {
+    // Initialize rate limiting
     (0, rate_limit_1.initRateLimit)(app);
+    // Initialize CORS
     app.use((0, cors_1.default)(corsOptions));
+    // Other middleware
     app.use((0, cookie_parser_1.default)("secret-cookie"));
     app.use(express_1.default.json());
     app.use(express_1.default.urlencoded({ extended: false }));
     app.use((0, morgan_1.default)(isProd_1.isProduction ? "combined" : "dev"));
+    // Initialize routes
     (0, routes_1.initRoutes)(app);
 };
+// Health check route outside of initRoutes to ensure it's available
+app.get("/backend/api/health", (req, res) => {
+    res.status(200).json({ message: "Server is running!" });
+});
 const startServer = () => {
     app.listen(port, () => {
         console.log(colors_1.default.green.underline(`Server running on port ${port}`));
