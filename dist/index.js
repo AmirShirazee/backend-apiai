@@ -7,38 +7,36 @@ const express_1 = __importDefault(require("express"));
 const colors_1 = __importDefault(require("colors"));
 const morgan_1 = __importDefault(require("morgan"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const cors_1 = __importDefault(require("cors"));
 const routes_1 = require("./routes");
 const rate_limit_1 = require("./startup/rate-limit");
 const isProd_1 = require("./utils/isProd");
 const mongo_1 = __importDefault(require("./db/mongo"));
 const port = 3000;
 const app = (0, express_1.default)();
-// app.set("trust proxy", 1);
-// const allowedOrigins = ["http://localhost:8080", "https://testopenapi.com"];
-// const corsOptions: CorsOptions = {
-//   origin: (
-//     origin: string | undefined,
-//     callback: (err: Error | null, allow?: boolean) => void,
-//   ): void => {
-//     if (!origin || allowedOrigins.includes(origin)) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error("Not allowed by CORS"), false);
-//     }
-//   },
-//   credentials: true,
-//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-//   allowedHeaders: "Content-Type,Authorization",
-//   preflightContinue: false,
-//   optionsSuccessStatus: 204,
-// };
+const allowedOrigins = ["http://localhost:8080", "https://testopenapi.com"];
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error("Not allowed by CORS"), false);
+        }
+    },
+    credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type,Authorization",
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+};
 const initializeMiddleware = (app) => {
     // Initialize rate limiting
     (0, rate_limit_1.initRateLimit)(app);
     // Initialize CORS
-    // app.use(cors(corsOptions));
+    app.use((0, cors_1.default)(corsOptions));
     // Handle preflight requests
-    // app.options("*", cors(corsOptions));
+    app.options("*", (0, cors_1.default)(corsOptions));
     // Other middleware
     app.use((0, cookie_parser_1.default)("secret-cookie"));
     app.use(express_1.default.json());
