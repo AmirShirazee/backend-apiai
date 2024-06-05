@@ -26,12 +26,18 @@ const corsOptions = {
         }
     },
     credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type,Authorization",
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
 };
 const initializeMiddleware = (app) => {
     // Initialize rate limiting
     (0, rate_limit_1.initRateLimit)(app);
     // Initialize CORS
     app.use((0, cors_1.default)(corsOptions));
+    // Handle preflight requests
+    app.options("*", (0, cors_1.default)(corsOptions));
     // Other middleware
     app.use((0, cookie_parser_1.default)("secret-cookie"));
     app.use(express_1.default.json());

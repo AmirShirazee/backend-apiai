@@ -26,6 +26,10 @@ const corsOptions: CorsOptions = {
     }
   },
   credentials: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization",
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
 };
 
 const initializeMiddleware = (app: Express) => {
@@ -34,6 +38,9 @@ const initializeMiddleware = (app: Express) => {
 
   // Initialize CORS
   app.use(cors(corsOptions));
+
+  // Handle preflight requests
+  app.options("*", cors(corsOptions));
 
   // Other middleware
   app.use(cookieParser("secret-cookie"));
