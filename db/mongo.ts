@@ -1,13 +1,12 @@
 import mongoose, { ConnectOptions } from 'mongoose';
 import colors from 'colors';
-import { isProduction } from '../utils/isProd';
 
 interface Connect extends ConnectOptions {
   maxPoolSize?: number;
 }
 mongoose.set('strictQuery', true);
 
-const connectionString = 'mongodb+srv://root:root@cluster0.2v1s9.mongodb.net/ApiAi?retryWrites=true&w=majority'
+const connectionString = process.env.MONGO_URI!;
 if (!connectionString) {
   console.error(
     colors.red.underline('No DB connection string found. Please set the DB. Process exiting...'),
